@@ -51,7 +51,9 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
     event Voted(uint256 indexed tokenId, address indexed voter, bool isOriginal);
     event StatusChanged(uint256 indexed tokenId, Status newStatus);
 
-    constructor() ERC721("WatsonDocument", "WTS") Ownable(msg.sender) {}
+    constructor() ERC721("WatsonDocument", "WTS") Ownable(msg.sender) {
+        authorizedMinters[msg.sender] = true;
+    }
 
     function setPlatformBaseUrl(string memory _newUrl) external onlyOwner {
         platformBaseUrl = _newUrl;

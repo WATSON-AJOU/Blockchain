@@ -1,40 +1,47 @@
 import { ethers } from "hardhat";
 
-const CONTRACT_ADDRESS = "0x21702c98A10f4a5D258AB31b761e261937508122";
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS ?? "";
+const WM_ID = Number(process.env.WM_ID ?? "1");
+const TOKEN_URI = process.env.TOKEN_URI ?? "ipfs://test-metadata";
+const IS_SUSPICIOUS = (process.env.IS_SUSPICIOUS ?? "true").toLowerCase() === "true";
+const FILE_HASH_SEED = process.env.FILE_HASH_SEED ?? `test-file-${WM_ID}`;
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  if (!CONTRACT_ADDRESS) {
+    throw new Error("CONTRACT_ADDRESS env is required");
+  }
 
-  console.log("Using account:", deployer.address);
+  const [signer] = await ethers.getSigners();
+  console.log("Using account:", signer.address);
 
-  const contract = await ethers.getContractAt(
-    "WatsonNFT",
-    CONTRACT_ADDRESS
-  );
+  const contract = await ethers.getContractAt("WatsonNFT", CONTRACT_ADDRESS);
 
-  // minter 권한 부여 (owner만 가능)
-  const setMinterTx = await contract.setMinter(deployer.address, true);
-  await setMinterTx.wait();
-  console.log("Minter authorized");
+  const owner = await contract.owner();
+  const isMinter = await contract.authorizedMinters(signer.address);
 
-  // 테스트용 fileHash 생성
-  const fileHash = ethers.keccak256(
-    ethers.toUtf8Bytes("test-file-1")
-  );
+  if (!isMinter) {
+    if (owner.toLowerCase() !== signer.address.toLowerCase()) {
+      throw new Error("Signer is not a minter and cannot self-authorize (owner only)");
+    }
 
-  // mint 실행
+    const setMinterTx = await contract.setMinter(signer.address, true);
+    await setMinterTx.wait();
+    console.log("Minter authorized for signer");
+  }
+
+  const fileHash = ethers.keccak256(ethers.toUtf8Bytes(FILE_HASH_SEED));
+
   const mintTx = await contract.mintDocument(
-    deployer.address,
-    1,                      // wmId
+    signer.address,
+    WM_ID,
     fileHash,
     Math.floor(Date.now() / 1000),
-    "ipfs://test-metadata",
-    true                    // isSuspicious → Pending 상태
+    TOKEN_URI,
+    IS_SUSPICIOUS
   );
 
-  await mintTx.wait();
-
-  console.log("Mint complete");
+  const receipt = await mintTx.wait();
+  console.log("Mint complete. Tx hash:", receipt?.hash);
 }
 
 main().catch((error) => {
