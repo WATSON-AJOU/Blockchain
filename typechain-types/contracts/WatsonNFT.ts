@@ -26,8 +26,8 @@ import type {
 export interface WatsonNFTInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "MAX_SUPPLY"
       | "approve"
+      | "authorizedMinters"
       | "balanceOf"
       | "documents"
       | "finalizeStatus"
@@ -44,14 +44,18 @@ export interface WatsonNFTInterface extends Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "setMinter"
       | "setPlatformBaseUrl"
+      | "setVotingDuration"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
       | "transferFrom"
       | "transferOwnership"
+      | "usedFileHash"
       | "verifyDocument"
       | "voteForDocument"
+      | "votingDuration"
       | "wmIdToTokenId"
   ): FunctionFragment;
 
@@ -69,12 +73,12 @@ export interface WatsonNFTInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "MAX_SUPPLY",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "approve",
     values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "authorizedMinters",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
@@ -142,8 +146,16 @@ export interface WatsonNFTInterface extends Interface {
     values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMinter",
+    values: [AddressLike, boolean]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setPlatformBaseUrl",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setVotingDuration",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -163,6 +175,10 @@ export interface WatsonNFTInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "usedFileHash",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "verifyDocument",
     values: [BigNumberish]
   ): string;
@@ -171,12 +187,19 @@ export interface WatsonNFTInterface extends Interface {
     values: [BigNumberish, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "votingDuration",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "wmIdToTokenId",
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "MAX_SUPPLY", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "authorizedMinters",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "documents", data: BytesLike): Result;
   decodeFunctionResult(
@@ -223,8 +246,13 @@ export interface WatsonNFTInterface extends Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setMinter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setPlatformBaseUrl",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setVotingDuration",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -242,11 +270,19 @@ export interface WatsonNFTInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "usedFileHash",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "verifyDocument",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "voteForDocument",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "votingDuration",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -457,12 +493,16 @@ export interface WatsonNFT extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  MAX_SUPPLY: TypedContractMethod<[], [bigint], "view">;
-
   approve: TypedContractMethod<
     [to: AddressLike, tokenId: BigNumberish],
     [void],
     "nonpayable"
+  >;
+
+  authorizedMinters: TypedContractMethod<
+    [arg0: AddressLike],
+    [boolean],
+    "view"
   >;
 
   balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
@@ -554,8 +594,20 @@ export interface WatsonNFT extends BaseContract {
     "nonpayable"
   >;
 
+  setMinter: TypedContractMethod<
+    [_minter: AddressLike, _status: boolean],
+    [void],
+    "nonpayable"
+  >;
+
   setPlatformBaseUrl: TypedContractMethod<
     [_newUrl: string],
+    [void],
+    "nonpayable"
+  >;
+
+  setVotingDuration: TypedContractMethod<
+    [_duration: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -582,6 +634,8 @@ export interface WatsonNFT extends BaseContract {
     "nonpayable"
   >;
 
+  usedFileHash: TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
+
   verifyDocument: TypedContractMethod<
     [wmId: BigNumberish],
     [
@@ -602,6 +656,8 @@ export interface WatsonNFT extends BaseContract {
     "nonpayable"
   >;
 
+  votingDuration: TypedContractMethod<[], [bigint], "view">;
+
   wmIdToTokenId: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
@@ -609,15 +665,15 @@ export interface WatsonNFT extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "MAX_SUPPLY"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
     nameOrSignature: "approve"
   ): TypedContractMethod<
     [to: AddressLike, tokenId: BigNumberish],
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "authorizedMinters"
+  ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
@@ -716,8 +772,18 @@ export interface WatsonNFT extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setMinter"
+  ): TypedContractMethod<
+    [_minter: AddressLike, _status: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "setPlatformBaseUrl"
   ): TypedContractMethod<[_newUrl: string], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setVotingDuration"
+  ): TypedContractMethod<[_duration: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "supportsInterface"
   ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
@@ -737,6 +803,9 @@ export interface WatsonNFT extends BaseContract {
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "usedFileHash"
+  ): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "verifyDocument"
   ): TypedContractMethod<
@@ -759,6 +828,9 @@ export interface WatsonNFT extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "votingDuration"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "wmIdToTokenId"
   ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;

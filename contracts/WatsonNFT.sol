@@ -9,7 +9,6 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
     using Strings for uint256;
 
     uint256 private _nextTokenId = 1;
-    uint256 public constant MAX_SUPPLY = 1000;
 
     uint256 public votingDuration = 3 days;
 
@@ -69,7 +68,6 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
         string memory tokenURI_,
         bool isSuspicious
     ) external onlyMinter returns (uint256) {
-        require(_nextTokenId <= MAX_SUPPLY, "Max supply reached");
         require(wmIdToTokenId[wmId] == 0, "WM_ID already registered");
         require(!usedFileHash[fileHash], "File already registered");
 
