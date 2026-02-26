@@ -60,7 +60,7 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
     // =========================================================
     // 내부 존재 체크 함수 (High 이슈 해결 핵심)
     // =========================================================
-    function _requireOwned(uint256 tokenId) internal view {
+    function _checkTokenExists(uint256 tokenId) internal view {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
     }
 
@@ -112,7 +112,7 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
     // ====== 투표 ======
     function voteForDocument(uint256 tokenId, bool isOriginal) external {
 
-        _requireOwned(tokenId);  // 존재 체크 추가
+        _checkTokenExists(tokenId);  // 존재 체크 추가
 
         DocumentInfo storage doc = documents[tokenId];
 
@@ -135,7 +135,7 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
     // ====== 투표 종료 ======
     function finalizeStatus(uint256 tokenId) external {
 
-        _requireOwned(tokenId);  // High 버그 해결
+        _checkTokenExists(tokenId);  // High 버그 해결
 
         DocumentInfo storage doc = documents[tokenId];
 
@@ -158,7 +158,7 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
         view
         returns (string memory)
     {
-        _requireOwned(tokenId);  // Medium 이슈 해결
+        _checkTokenExists(tokenId);  // Medium 이슈 해결
 
         return string(
             abi.encodePacked(platformBaseUrl, tokenId.toString())

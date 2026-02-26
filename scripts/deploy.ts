@@ -1,20 +1,16 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
-
-  console.log("------------------------------------------");
-  console.log("Deploying contracts with:", deployer.address);
+  console.log("Deploying WatsonNFT...");
 
   const WatsonNFT = await ethers.getContractFactory("WatsonNFT");
-  const watsonNFT = await WatsonNFT.deploy();
+  const contract = await WatsonNFT.deploy();
 
-  await watsonNFT.waitForDeployment();
+  await contract.waitForDeployment();
 
-  const address = await watsonNFT.getAddress();
+  const address = await contract.getAddress();
 
-  console.log("WatsonNFT deployed at:", address);
-  console.log("------------------------------------------");
+  console.log("WatsonNFT deployed to:", address);
 }
 
 main().catch((error) => {
