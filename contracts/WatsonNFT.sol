@@ -79,7 +79,7 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
 
         uint256 tokenId = _nextTokenId++;
 
-        // 🔒 _mint → _safeMint (Medium 이슈 해결)
+        // _mint → _safeMint (Medium 이슈 해결)
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, tokenURI_);
 
@@ -135,7 +135,7 @@ contract WatsonNFT is ERC721URIStorage, Ownable {
     // ====== 투표 종료 ======
     function finalizeStatus(uint256 tokenId) external {
 
-        _requireOwned(tokenId);  // 🔥 High 버그 해결
+        _requireOwned(tokenId);  // High 버그 해결
 
         DocumentInfo storage doc = documents[tokenId];
 
